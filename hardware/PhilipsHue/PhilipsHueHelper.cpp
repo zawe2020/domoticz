@@ -2,6 +2,9 @@
 #include "PhilipsHue.h"
 #include "../../main/Logger.h"
 #include <cmath>
+#include <algorithm>
+#undef min
+#undef max
 
 /*
  * Helper funtions to convert from Philips XY color to RGB

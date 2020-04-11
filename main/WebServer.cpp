@@ -48,6 +48,7 @@
 #include "SQLHelper.h"
 #include "../push/BasePush.h"
 #include <algorithm>
+
 #ifdef ENABLE_PYTHON
 #include "../hardware/plugins/Plugins.h"
 #endif
@@ -66,6 +67,8 @@
 #include <inttypes.h>
 
 #define round(a) ( int ) ( a + .5 )
+#undef min
+#undef max
 
 extern std::string szStartupFolder;
 extern std::string szUserDataFolder;

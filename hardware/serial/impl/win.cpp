@@ -1,5 +1,6 @@
 /* Copyright 2012 William Woodall and John Harrison */
 #include "stdafx.h"
+#ifdef WIN32
 #include <sstream>
 
 #include "win.h"
@@ -633,3 +634,4 @@ Serial::SerialImpl::writeUnlock()
     THROW (IOException, "Error releasing write mutex.");
   }
 }
+#endif

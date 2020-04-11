@@ -10,6 +10,7 @@
 #include "../notifications/NotificationHelper.h"
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
+#include <algorithm>
 
 #define RETRY_DELAY 30
 
@@ -17,6 +18,8 @@
 #define TOPIC_OUT	"domoticz/out"
 #define TOPIC_IN	"domoticz/in"
 #define QOS         1
+#undef min
+#undef max
 
 const char* szTLSVersions[3] =
 {

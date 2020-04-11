@@ -5,6 +5,7 @@
 //
 #ifdef ENABLE_PYTHON
 
+#undef _snprintf
 #include "PluginMessages.h"
 #include "PluginTransports.h"
 #include "PythonObjects.h"

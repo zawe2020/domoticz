@@ -26,6 +26,8 @@
 #include "../main/localtime_r.h"
 #include "../main/WebServer.h"
 #include <json/json.h>
+#undef min
+#undef max
 
 
 extern std::string szUserDataFolder;

@@ -14,6 +14,8 @@
 #include "../hardwaretypes.h"
 
 #define round(a) ( int ) ( a + .5 )
+#undef min
+#undef max
 
 #define HUE_DEFAULT_POLL_INTERVAL 10
 #define HUE_NOT_ADD_GROUPS 0x01

@@ -52,14 +52,14 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 IF(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch -Wno-parentheses-equality -Wno-deprecated-declarations -Wno-tautological-compare -Wno-unused-value -Wno-comment -Wno-unsequenced -Wno-logical-op-parentheses -Wno-literal-conversion")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch -Wno-parentheses-equality -Wno-deprecated-declarations -Wno-tautological-compare -Wno-unused-value -Wno-comment -Wno-unsequenced -Wno-logical-op-parentheses -Wno-literal-conversion")  
+ELSEIF(CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
+ELSEIF(CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
 ENDIF()
-IF(CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-ENDIF()
-IF(CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-ENDIF()
+FIND_PACKAGE( Threads REQUIRED )
+
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-psabi -rdynamic")
   #SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-switch")
@@ -169,6 +169,7 @@ main/TrendCalculator.cpp
 main/WebServer.cpp
 main/WebServerHelper.cpp
 main/WindCalculation.cpp
+msbuild/WindowsHelper.cpp
 push/BasePush.cpp
 push/FibaroPush.cpp
 push/GooglePubSubPush.cpp
@@ -299,6 +300,7 @@ hardware/SatelIntegra.cpp
 hardware/SBFSpot.cpp
 hardware/serial/serial.cpp
 hardware/serial/impl/unix.cpp
+hardware/serial/impl/win.cpp
 hardware/SolarEdgeAPI.cpp
 hardware/SolarMaxTCP.cpp
 hardware/Sterbox.cpp
@@ -383,7 +385,20 @@ tinyxpath/xpath_static.cpp
 tinyxpath/xpath_syntax.cpp
 )
 
-add_executable(domoticz ${domoticz_SRCS})
+IF(MSVC)
+    ADD_DEFINITIONS("/EHsc")
+ENDIF(MSVC)
+
+IF(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  add_definitions(-DHAVE_SNPRINTF -DWIN32 -D_WIN32)
+  add_executable(domoticz WIN32 ${domoticz_SRCS})
+
+  target_link_libraries(domoticz
+    Setupapi.lib
+  )
+ELSE()
+  add_executable(domoticz ${domoticz_SRCS})
+ENDIF()
 
 #
 # LUA
@@ -611,14 +626,14 @@ else(USE_STATIC_BOOST)
    message(STATUS "Linking against boost dynamic libraries")
 endif(USE_STATIC_BOOST)
 
-find_package(Boost REQUIRED COMPONENTS thread system)
+find_package(Boost REQUIRED COMPONENTS thread system serialization chrono exception)
 if(Boost_FOUND)
     MESSAGE(STATUS "BOOST includes found at: ${Boost_INCLUDE_DIR}")
 else(Boost_FOUND)
     MESSAGE(FATAL_ERROR "Boost thread/system library not found on your system, try to get this installed.")
 endif(Boost_FOUND)
 
-target_link_libraries(domoticz Boost::thread Boost::system)
+target_link_libraries(domoticz Boost::thread Boost::system Boost::serialization Boost::chrono Boost::exception)
 
 # compare found vs required libBoost version
 if(Boost_VERSION VERSION_LESS DOMO_MIN_LIBBOOST_VERSION)
@@ -744,7 +759,8 @@ else()
   message(STATUS "Not found telldus-core (telldus-core.h), not adding tellstick support")
 endif (TELLDUSCORE_INCLUDE)
 
-target_link_libraries(domoticz ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${MINIZIP_LIBRARIES} ${CURL_LIBRARIES} pthread ${MQTT_LIBRARIES} ${LUA_LIBRARIES} ${CMAKE_DL_LIBS} ${TELLDUS_LIBRARIES})
+target_link_libraries(domoticz ${ZLIB_LIBRARIES} ${MINIZIP_LIBRARIES} ${CURL_LIBRARIES} Threads::Threads ${MQTT_LIBRARIES} ${LUA_LIBRARIES} ${CMAKE_DL_LIBS} ${TELLDUS_LIBRARIES})
+target_compile_options(domoticz INTERFACE Threads::Threads )
 
 IF(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   target_link_libraries(domoticz -lresolv)

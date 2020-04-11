@@ -175,6 +175,8 @@
 #endif
 
 #define round(a) ( int ) ( a + .5 )
+#undef min
+#undef max
 
 extern std::string szStartupFolder;
 extern std::string szUserDataFolder;
