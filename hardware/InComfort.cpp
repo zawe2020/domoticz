@@ -123,7 +123,7 @@ std::string CInComfort::SetRoom1SetTemperature(float tempSetpoint)
 	float setpointToSet = (tempSetpoint - 5.0f) * 10.0f;
 
 	std::stringstream sstr;
-	sstr << "http://" << m_szIPAddress << ":" << m_usIPPort << "/data.json?heater=0&setpoint=" << setpointToSet << "&thermostat=0";
+	sstr << "http://" << m_szIPAddress << ":" << m_usIPPort << "/protect/data.json?heater=0&setpoint=" << setpointToSet << "&thermostat=0";
 
 	return GetHTTPData(sstr.str());
 }
@@ -134,7 +134,7 @@ void CInComfort::GetHeaterDetails()
 		return;
 
 	std::stringstream sstr;
-	sstr << "http://" << m_szIPAddress << ":" << m_usIPPort << "/data.json";
+	sstr << "http://" << m_szIPAddress << ":" << m_usIPPort << "/protect/data.json";
 
 	// Get Data
 	std::string sResult = GetHTTPData(sstr.str());
